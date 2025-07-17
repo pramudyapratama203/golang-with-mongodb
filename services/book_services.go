@@ -76,3 +76,11 @@ func DeleteBook(id int) bool {
 	delete(booksData, id)
 	return true
 }
+
+func DeleteAllBook() {
+	bookMuted.Lock()
+	defer bookMuted.Unlock()
+
+	booksData = make(map[int]models.Book);
+	nextId = 1;
+}
