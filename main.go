@@ -1,27 +1,27 @@
 package main
 
 import (
-	"api-book/handlers"
-	"api-book/services"
 	"fmt"
 	"log"
-
 	"github.com/gin-gonic/gin"
+	"api-book/handlers"
+	"api-book/services"
 )
 
 func main() {
-	gin.SetMode(gin.ReleaseMode);
+	gin.SetMode(gin.ReleaseMode)
+
+	services.InitMongoDB()
+	defer services.CloseMongoDB()
+	
 	router := gin.Default()
 
-	services.IntBook();
+	router.GET("/books", handlers.GetAllBook)
+	router.GET("/books/:id", handlers.GetBookByID)
+	router.POST("/books", handlers.CreateBook)
+	router.PUT("/books/:id", handlers.UpdateBook)
+	router.DELETE("/books/:id", handlers.DeleteBook)
 
-	router.GET("/book", handlers.GetAllBooks);
-	router.GET("/book/:id", handlers.GetBookById);
-	router.POST("/book", handlers.CreateBook);
-	router.PUT("/book/:id", handlers.UpdateBook);
-	router.DELETE("/book/:id", handlers.DeleteBook);
-	router.DELETE("/book", handlers.DeleteAllBook);
-
-	fmt.Print("http://localhost:8080");
+	fmt.Println("http://localhost:8080");
 	log.Fatal(router.Run(":8080"));
 }

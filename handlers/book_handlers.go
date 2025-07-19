@@ -1,101 +1,100 @@
 package handlers
 
 import (
-	"api-book/services"
-	"api-book/models"
+	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"api-book/models"
+	"api-book/services"
 )
 
 func sendError(c *gin.Context, statusCode int, message string) {
-	c.JSON(statusCode, gin.H{"error" : message});
-}
+	c.JSON(statusCode, gin.H{"error": message})
+}	
 
-func GetAllBooks(c *gin.Context) {
-	books := services.GetAllBooks();
-	c.JSON(http.StatusOK, books);
-}
-
-func GetBookById(c *gin.Context) {
-	idStr := c.Param("id");
-
-	idInt, err := strconv.Atoi(idStr);
+func GetAllBook(c *gin.Context) {
+	books, err := services.GetAllBook()
 	if err != nil {
-		sendError(c, http.StatusBadRequest, "Id harus berupa angka");
-		return;
+		sendError(c, http.StatusInternalServerError, fmt.Sprintf("Gagal mengambil buku", err))
+		return
+	}
+	c.JSON(http.StatusOK, books)
+}
+
+func GetBookByID(c *gin.Context) {
+	idStr := c.Param("id")
+
+	objectID, err := primitive.ObjectIDFromHex(idStr)
+	if err != nil {
+		sendError(c, http.StatusBadRequest, "ID Buku tidak valid")
+		return
 	}
 
-	getBook, success := services.GetBookById(idInt);
-	if !success {
-		sendError(c, http.StatusBadRequest, "Data tidak ada");
-		return;
+	book, err := services.GetBookByID(objectID)
+	if err != nil {
+		sendError(c, http.StatusNotFound, "Buku tidak ditemukan")
+		return
 	}
-
-	c.JSON(http.StatusOK, getBook)
+	c.JSON(http.StatusOK, book)
 }
 
 func CreateBook(c *gin.Context) {
 	var newBook models.Book
-
 	if err := c.BindJSON(&newBook); err != nil {
-		sendError(c, http.StatusBadRequest, "Format buku tidak valid");
-		return;
+		sendError(c, http.StatusBadRequest, "Format buku tidak valid")
+		return
 	}
 
-	if newBook.Title == "" {
-		sendError(c, http.StatusBadRequest, "Judul buku harus diisi");
-		return;
+	if newBook.Title == "" || newBook.Author == "" {
+		sendError(c, http.StatusNotFound, "Judul dan Penulis buku tidak boleh kosong")
+		return
 	}
 
-	create := services.CreateBook(newBook);
-	c.JSON(http.StatusOK, create);
+	createBook, err := services.CreateBook(newBook)
+	if err != nil {
+		sendError(c, http.StatusInternalServerError, fmt.Sprintf("Gagal membuat buku: %v", err))
+		return
+	}
+	c.JSON(http.StatusCreated, createBook)
 }
 
 func UpdateBook(c *gin.Context) {
-	idStr := c.Param("id");
-	var updateBook models.Book
-
-	if err := c.BindJSON(&updateBook); err != nil {
-		sendError(c, http.StatusBadRequest, "Format update tidak valid");
-		return;
-	}
-
-	idInt, err := strconv.Atoi(idStr);
+	idStr := c.Param("id")
+	objectID, err := primitive.ObjectIDFromHex(idStr)
 	if err != nil {
-		sendError(c, http.StatusBadRequest, "Id harus berupa angka");
-		return;
+		sendError(c, http.StatusBadRequest, "ID buku tidak valid")
+		return
 	}
 
-	update, success := services.UpdateBook(idInt, updateBook);
-	if !success {
-		sendError(c, http.StatusBadRequest, "Gagal update buku");
-		return;
+	var updateBook models.Book
+	if err := c.BindJSON(&updateBook); err != nil {
+		sendError(c, http.StatusBadRequest, "Format buku tidak valid")
+		return
 	}
 
-	c.JSON(http.StatusOK, update);
+	book, err := services.UpdateBook(objectID, updateBook)
+	if err != nil {
+		sendError(c, http.StatusNotFound, "Buku tidak dtemukan")
+		return
+	}
+	c.JSON(http.StatusOK, book)
 }
 
 func DeleteBook(c *gin.Context) {
-	idStr := c.Param("id");
-
-	idInt, err := strconv.Atoi(idStr);
+	idStr := c.Param("id")
+	objectID, err := primitive.ObjectIDFromHex(idStr)
 	if err != nil {
-		sendError(c, http.StatusBadRequest, "Id harus berupa angka");
-		return;
+		sendError(c, http.StatusBadRequest, "ID buku tidak valid")
+		return
 	}
 
-	delete := services.DeleteBook(idInt);
-	if !delete {
-		sendError(c, http.StatusBadRequest, "Gagal menghapus buku");
-		return;
+	success, err := services.DeleteBook(objectID)
+	if err != nil {
+		sendError(c, http.StatusNotFound, "Buku tidak dtemukan")
+		return
 	}
-	
-	c.JSON(http.StatusOK, delete);
-}
-
-func DeleteAllBook(c *gin.Context) {
-	services.DeleteAllBook();
-	c.JSON(http.StatusOK, gin.H{"message" : "Semua data berhasil dihapus"});
+	c.JSON(http.StatusOK, success)
 }
