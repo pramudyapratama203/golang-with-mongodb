@@ -124,7 +124,7 @@ func GetAllBooks() ([]models.Book, error) { // Nama fungsi disesuaikan
 
     for cursor.Next(ctx) {
         var book models.Book
-        if err := cursor.Decode(&book); err != nil { // Menggunakan &book
+        if err := cursor.Decode(&book); err != nil { // Menggunakan &book dan jangan lupa decode
             return nil, fmt.Errorf("Gagal decode buku dari cursor : %w", err) // Pesan error diperbaiki
         }
         books = append(books, book)
