@@ -10,7 +10,17 @@ API ini menyediakan operasi dasar untuk mengelola buku:
 4. PUT /books/:id: Memperbarui detail buku yang sudah ada.
 5. DELETE /books/:id: Menghapus buku dari koleksi.
 6. DELETE /books: Menghapus semua buku yang ada di koleksi.
-   
+
+## Cara Menjalankan
+```bash
+go mod init api-book
+go get github.com/gin-gonic/gin
+go get go.mongodb.org/mongo-driver/mongo
+go get go.mongodb.org/mongo-driver/mongo/options
+go get go.mongodb.org/mongo-driver/bson
+go mod tidy // disarankan untuk membersihkan dependensi yang tidak terpakai 
+go run main.go
+```
 ## Struktur Proyek
 ```
 api-book/
@@ -427,14 +437,6 @@ func main() {
 	// Mulai server Gin di port 8080. Jika ada error fatal saat startup, program akan berhenti.
 	log.Fatal(router.Run(":8080"))
 }
-```
-
-## Cara Menjalankan
-```bash
-go mod init api-book
-go get github.com/gin-gonic/gin
-go mod tidy
-go run main.go
 ```
 
 Uji API dengan Postman / cURL:
