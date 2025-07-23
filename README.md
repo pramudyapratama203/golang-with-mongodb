@@ -18,7 +18,7 @@ go get github.com/gin-gonic/gin
 go get go.mongodb.org/mongo-driver/mongo
 go get go.mongodb.org/mongo-driver/mongo/options
 go get go.mongodb.org/mongo-driver/bson
-go mod tidy // disarankan untuk membersihkan dependensi yang tidak terpakai 
+go mod tidy // Disarankan untuk membersihkan dependensi yang tidak terpakai
 go run main.go
 ```
 ## Struktur Proyek
