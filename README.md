@@ -12,7 +12,7 @@ API ini menyediakan operasi dasar untuk mengelola buku:
 6. DELETE /books: Menghapus semua buku yang ada di koleksi.
 
 ## Cara Menjalankan
-```bash
+```go
 go mod init api-book
 go get github.com/gin-gonic/gin
 go get go.mongodb.org/mongo-driver/mongo
