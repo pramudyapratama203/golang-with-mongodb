@@ -13,7 +13,7 @@ API ini menyediakan operasi dasar untuk mengelola buku:
 
 ## Cara Menjalankan
 ```go
-go mod init api-book
+go mod init api-book 
 go get github.com/gin-gonic/gin
 go get go.mongodb.org/mongo-driver/mongo
 go get go.mongodb.org/mongo-driver/mongo/options
@@ -82,7 +82,7 @@ var collection *mongo.Collection
 
 // InitMongoDB: Fungsi ini akan menginisialisasi koneksi ke MongoDB.
 func InitMongoDB() {
-    clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+    clientOptions := options.Client().ApplyURI("mongodb://localhost:27017") // Jangan sampai salah
 
     ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
     defer cancel()
